@@ -16,12 +16,35 @@
    * 'medical_help'
    * 'medical_products'
    * 'search_and_rescue'
-   * 'security', 'military', 'child_alone', 'water', 'food', 'shelter',
-       'clothing', 'money', 'missing_people', 'refugees', 'death', 'other_aid',
-       'infrastructure_related', 'transport', 'buildings', 'electricity',
-       'tools', 'hospitals', 'shops', 'aid_centers', 'other_infrastructure',
-       'weather_related', 'floods', 'storm', 'fire', 'earthquake', 'cold',
-       'other_weather', 'direct_report'
+   * 'security'
+   * 'military'
+   * 'child_alone'
+   * 'water'
+   * 'food'
+   * 'shelter',
+   * 'clothing'
+   * 'money'
+   * 'missing_people'
+   * 'refugees'
+   * 'death'
+   * 'other_aid',
+   * 'infrastructure_related'
+   * 'transport'
+   * 'buildings'
+   * 'electricity'
+   * 'tools'
+   * 'hospitals'
+   * 'shops'
+   * 'aid_centers'
+   * 'other_infrastructure'
+   * 'weather_related'
+   * 'floods'
+   * 'storm'
+   * 'fire'
+   * 'earthquake'
+   * 'cold'
+   * 'other_weather, 
+   * 'direct_report
 
 ### Instructions:
 1. Run the following commands in the project's root directory to set up your database and model.
