@@ -50,6 +50,14 @@
    * 'other_weather, 
    * 'direct_report
 
+### Pipeline:
+
+ > Base model pipeline:
+ 
+ ![Base_ML_Model](img/Base_ML_mddel.png)
+
+
+
 ### Instructions:
 1. Run the following commands in the project's root directory to set up your database and model.
 
