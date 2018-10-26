@@ -54,7 +54,7 @@
 
  > Base model pipeline:
  
- ![Base_ML_Model](img/Base_ML_model.png)
+ ![](img/Base_ML_Model.png)
 
 
 
