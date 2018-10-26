@@ -2,8 +2,12 @@
 
 ### Project Overview:
    Disaster Response Pipeline Project is a multiclass - multioutput classification problem, where we are analyzing the disaster data from Figure Eight to build a model for an API that classifies disaster messages.
-    
-   This project has built on a dataset containing real messages that were sent during disaster events. We have created a machine learning pipeline to categorize these events so that model can send the messages to an appropriate disaster relief agency. 
+   
+   This dataset contains 30,000 messages drawn from events including an earthquake in Haiti in 2010, an earthquake in Chile in 2010, floods in Pakistan in 2010, super-storm Sandy in the U.S.A. in 2012, and news articles spanning a large number of years and 100s of different disasters.
+
+  The data has been encoded with 36 different categories related to disaster response and has been stripped of messages with sensitive information in their entirety.
+
+  We have created a machine learning pipeline to categorize these incident so that model can send the messages to an appropriate disaster relief agency. 
     
    This project also include a web app where an emergency worker can input a new message and get classification results in several categories.
    
