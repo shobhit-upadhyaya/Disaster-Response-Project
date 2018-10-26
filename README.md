@@ -64,7 +64,8 @@
 ### Model Evaluation:
 
 Model has been evaluated on different metrics like Accuracy, F1-Score, Precision and Recall.
-Red Lines denotes base_ml_model and green denotes tunned_ml_model
+
+**Red Lines denotes base_ml_model and green denotes tunned_ml_model.**
 
 * ***Accuracy*:  Base ML Model vs Tunned ML Model.**
 ![](img/Accuracy.png)
