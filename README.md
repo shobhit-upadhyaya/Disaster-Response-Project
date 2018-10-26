@@ -52,9 +52,24 @@
 
 ### Pipeline:
 
- > Base model pipeline:
+ > **Base Model Pipeline:**
  
  ![](img/Base_ML_Model.png)
+ 
+ > **Tunned Model Pipeline:**
+ 
+  ![](img/tunned_pipeline.png)
+
+
+### Model Evaluation:
+
+Model has been evaluated on different metrics like Accuracy, F1-Score, Precision and Recall.
+
+* ***Accuracy*:  Base ML Model vs Tunned ML Model.**
+![](img/Accuracy.png)
+
+
+
 
 
 
