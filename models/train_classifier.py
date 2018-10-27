@@ -205,16 +205,6 @@ def build_model():
         
     ])  
 
-
-    #F1_SCORE_M = make_scorer(multioutput_f1_score, greater_is_better=True)
-
-    #parameters = {}
-
-    #cv = GridSearchCV(pipeline, param_grid=parameters, verbose=0, scoring=F1_SCORE_M, n_jobs=-1)
-
-
-
-
     return pipeline
 
 
