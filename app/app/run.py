@@ -7,9 +7,13 @@ from nltk.tokenize import word_tokenize
 
 from flask import Flask
 from flask import render_template, request, jsonify
-from plotly.graph_objs import Bar
+from plotly.graph_objs import Bar, Scatter, Layout
 from sklearn.externals import joblib
 from sqlalchemy import create_engine
+import plotly.figure_factory as ff
+
+import numpy as np
+
 
 import plotly
 import plotly.plotly as py
@@ -20,7 +24,17 @@ from custom_transformer import MessageExtractor, GenreExtractor, TextLengthExtra
 
 app = Flask(__name__)
 
+
 def tokenize(text):
+    '''
+        Input: text
+        Returns: clean tokens
+        Desc:
+
+            Generates a clean token of text (words) by first getting words from the text.
+            Applies Lemmatization on the words.
+            Normalize the text by lowering it and removes the extra spaces.
+    '''
     tokens = word_tokenize(text)
     lemmatizer = WordNetLemmatizer()
 
@@ -31,16 +45,73 @@ def tokenize(text):
 
     return clean_tokens
 
+
 def multioutput_f1_score(y_test, y_pred):
+    '''
+        Input: y_test and y_pred
+        Return: mean f1_score
+
+        Desc:
+            multioutput_f1_score function is a custom scoring function that is used by GridSearchCV for finding best results.
+            For all categories it first finds the F1-Score and returns the mean of all the F1-Scores.
+    '''
     f1_scores = []
     max_categories = len(y_test[0])
-    #print(max_categories)
-    #print(y_test.shape)
     for i in range(max_categories):
         res = f1_score(y_test[:,i], y_pred[:,i], average='weighted')
         f1_scores.append(res)
-    #print(np.mean(f1_scores))
     return np.mean(f1_scores)
+
+
+def bubble_line_plot_graph(genre_names,genre_counts):
+    '''
+        Input: genre_names, genre_counts
+        Return : graph
+        Desc:
+            Creates a joint graph of Bar and Line plots to demonstrate the distribution Genre and Message
+    '''
+    colors = [0.36673455, 0.89371485, 0.11163017]  #np.random.rand(N)
+    sz = genre_counts / 100    
+    print(colors)
+
+    bubble_line_graph = [{
+    "data": [
+        Scatter(x=genre_names, 
+            y=genre_counts,
+            mode = 'markers',
+            name = 'BubblePlot:  of Genres Message Group',
+            marker={'size': sz.values,
+                        'color': colors,
+                        'opacity': 0.6,
+                        'colorscale': 'Viridis'
+                       }
+            ),
+
+        Scatter(x=genre_names, 
+            y=genre_counts,
+            name = "LinePlot: of Genres Message Distribution",
+            line = dict(
+                color = ('rgb(22, 96, 167)'),
+                width = 4,
+                dash = 'dashdot')
+            )
+        
+            
+        ],
+    'layout': {
+                'title': 'BubblePlot and LinePlot: Distribution of Message Genres',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Genre"
+                }
+            }
+    }]
+    return bubble_line_graph
+
+
+
 
 # load data
 engine = create_engine('sqlite:///../data/DisasterResponse.db')
@@ -62,7 +133,7 @@ def index():
     
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
-    graphs = [
+    bar_graph = [
         {
             'data': [
                 Bar(
@@ -88,12 +159,19 @@ def index():
         }
     ]
 
+    #Another distribution of : Bubble and Line Graph
+    bubble_line_graph = bubble_line_plot_graph(genre_names, genre_counts)
+   
+    graphs = []
+    graphs.append(bar_graph[0])
+    graphs.append(bubble_line_graph[0])
 
-    
-    # encode plotly graphs in JSON
     ids = ["graph-{}".format(i) for i, _ in enumerate(graphs)]
     graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
     
+        
+    print(ids)
+
     # render web page with plotly graphs
     return render_template('master.html', ids=ids, graphJSON=graphJSON)
 
