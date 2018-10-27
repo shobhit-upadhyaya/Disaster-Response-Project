@@ -4,6 +4,14 @@ from sqlalchemy import create_engine
 
 
 def load_data(messages_filepath, categories_filepath):
+  """
+    Input: messages_filepath , categories_filepath
+    Return: dataframe
+
+    Desc:
+      load_data function helps loading the data from the file and returns df.
+  
+  """
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
     df = messages.merge(categories, how="outer", on="id")
@@ -12,11 +20,15 @@ def load_data(messages_filepath, categories_filepath):
 
 def seperate_category_columns(df):
   """
-    Split `categories` into separate category columns.
-    Split the values in the `categories` column on the `;` character so that each value becomes a separate column. 
-    You'll find pandas.Series.str.split.html very helpful! Make sure to set `expand=True`.
-    Use the first row of categories dataframe to create column names for the categories data.
-    Rename columns of `categories` with new column names.
+    Input: dataframe
+    Returns: dataframe of categories
+
+    Desc:
+      Split `categories` into separate category columns.
+      Split the values in the `categories` column on the `;` character so that each value becomes a separate column. 
+      You'll find pandas.Series.str.split.html very helpful! Make sure to set `expand=True`.
+      Use the first row of categories dataframe to create column names for the categories data.
+      Rename columns of `categories` with new column names.
   """
   df_categories = df.categories.str.split(';', expand=True)
 
@@ -49,9 +61,19 @@ def seperate_category_columns(df):
 
   return df_categories 
 
-def clean_data(df):
 
-  # Split `categories` into separate category columns.
+def clean_data(df):
+  """
+    Input: dataframe
+    Return: transformed clean dataframe
+
+    Desc:
+
+      Split `categories` into separate category columns.
+      Concats the categories into to input dataframe
+      Removes the duplicate rows of dataframe
+
+  """
   transformed_categories = seperate_category_columns(df)
   print(transformed_categories.shape)
 
@@ -80,8 +102,13 @@ def clean_data(df):
 
 def save_data(df, database_filename):
   """
-    You can do this with pandas.DataFrame.to_sql method combined with the SQLAlchemy library. 
-    Remember to import SQLAlchemy's `create_engine`
+    Input:  dataframe
+    Return: None
+
+    Desc:
+      Saves the input dataframe into database table. 
+      You can do this with pandas.DataFrame.to_sql method combined with the SQLAlchemy library. 
+      Remember to import SQLAlchemy's `create_engine`
   """
   engine = create_engine('sqlite:///'+database_filename)
   df.to_sql('DiasterResponseData', engine, index=False)  

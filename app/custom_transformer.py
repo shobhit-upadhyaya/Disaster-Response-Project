@@ -4,7 +4,12 @@ import pandas as pd
 
 
 class MessageExtractor(BaseEstimator, TransformerMixin):
-    
+    '''
+        Input: X
+        return: X['message']
+
+        MessageExtractor is a transformer , can be used in pipeline to extract the message feature from the input dataframe.
+    '''    
     def fit(self, X, y=None):
         return self
 
@@ -13,7 +18,13 @@ class MessageExtractor(BaseEstimator, TransformerMixin):
 
 
 class GenreExtractor(BaseEstimator, TransformerMixin):
-    
+    '''
+        Input: X
+        return: X['genre']
+
+        GenreExtractor is a transformer , can be used in pipeline to extract the genre feature from the input dataframe.
+    '''    
+
     def fit(self, X, y=None):
         return self
 
@@ -21,8 +32,15 @@ class GenreExtractor(BaseEstimator, TransformerMixin):
         return X["genre"].values.reshape(-1,1)
 
 
-
 class TextLengthExtractor(BaseEstimator, TransformerMixin):
+    '''
+        Input: X
+        return: pandas series of length of text
+
+        TextLengthExtractor is a transformer , can be used in pipeline to extract the length of the text from a given input.
+        Input can be an array of text or pandas Series.
+    '''
+
     def fit(self, X, y=None):
         return self
 
@@ -31,6 +49,13 @@ class TextLengthExtractor(BaseEstimator, TransformerMixin):
 
 
 class WordCountExtractor(BaseEstimator, TransformerMixin):
+    '''
+        Input: X
+        return: pandas series of word count
+
+        WordCountExtractor is a transformer , can be used in pipeline to extract the number of words of the text from a given input.
+        Input can be an array of text or pandas Series.
+    '''
     def fit(self, X, y=None):
         return self
 

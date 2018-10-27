@@ -10,7 +10,6 @@ import nltk
 nltk.download(['punkt', 'wordnet'])
 
 from collections import Counter
-
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from sklearn.multioutput import MultiOutputClassifier
@@ -23,11 +22,8 @@ from sklearn.metrics import f1_score, classification_report , accuracy_score, ma
 import pickle
 from xgboost import XGBClassifier
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
-
 from sklearn.linear_model import LogisticRegression
-
 from custom_transformer import MessageExtractor, GenreExtractor, TextLengthExtractor, WordCountExtractor
-
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -35,6 +31,15 @@ sns.set(style="darkgrid")
 
 
 def draw_evaluation_plots(old_results, new_results):
+    '''
+        Input: evaluation results of base and tunned model
+        Return: None
+    
+        Desc:
+            Creates a pointplot by comparing the results of two models.
+            Generates plots of Accuracy, F1-Score, Precision and Recall and save as png images
+    '''
+
     for col in old_results.columns:
         plt.figure(figsize=(15,5))
         plt.xticks(rotation=90)
@@ -47,10 +52,18 @@ def draw_evaluation_plots(old_results, new_results):
         sns_plot.figure.savefig("./img/"+ col +".png")
 
 
-
 def load_data(database_filepath):
-    # load data from database
-    # Load dataset from database with read_sql_table()
+    '''
+        Input: database_filepath
+        return : X, y and category_names
+
+        Desc:
+
+            Creates sqlite engine.
+            Reads the data of sql table and load it as dataframe.
+            Load dataset from database by using read_sql_table()
+            Generates X, y and category_names
+    '''
 
     engine = create_engine('sqlite:///'+database_filepath)
     df = pd.read_sql_table('DiasterResponseData', engine)
@@ -62,7 +75,17 @@ def load_data(database_filepath):
 
     return X, y, category_names
 
+
 def tokenize(text):
+    '''
+        Input: text
+        Returns: clean tokens
+        Desc:
+
+            Generates a clean token of text (words) by first getting words from the text.
+            Applies Lemmatization on the words.
+            Normalize the text by lowering it and removes the extra spaces.
+    '''
     tokens = word_tokenize(text)
     lemmatizer = WordNetLemmatizer()
 
@@ -74,9 +97,16 @@ def tokenize(text):
     return clean_tokens
 
 
-
-
 def multioutput_f1_score(y_test, y_pred):
+    '''
+        Input: y_test and y_pred
+        Return: mean f1_score
+
+        Desc:
+            multioutput_f1_score function is a custom scoring function that is used by GridSearchCV for finding best results.
+            For all categories it first finds the F1-Score and returns the mean of all the F1-Scores.
+    '''
+
     f1_scores = []
     max_categories = len(y_test[0])
     #print(max_categories)
@@ -87,7 +117,29 @@ def multioutput_f1_score(y_test, y_pred):
     #print(np.mean(f1_scores))
     return np.mean(f1_scores)
 
+
 def build_model_tunned():
+    '''
+        Input: None
+        Returns: CV (GridSearch cross validator)
+
+        Desc:
+            build_model_tunned function() creates a pipeline by using FeatureUnion.
+            Features:
+                BOW features by Text transformation
+                TextLength Extractor
+                WordCount Extractor
+
+            Estimator:
+                XGBClassifier
+
+            GridSearchCV : for fine tunning pipeline hyper-parameters.
+
+            For a scoring function , we are using custom mean F1-Score function that satisfies the criteria for 
+            selecting best hyper-parameter and best-estimators.
+
+            Returns cv after finding the best parameters and estimators.
+    '''
     
     pipeline = Pipeline([
         ('features', FeatureUnion([
@@ -123,22 +175,22 @@ def build_model_tunned():
     'features__text_pipeline__tfidf__use_idf': (False,),
     
     'clf__estimator__n_estimators': [200,],
-    #'clf__estimator__min_samples_split': [4,],
-    # 'features__transformer_weights': (
-    #     {'text_pipeline': 1, 'starting_verb': 0.5},
-    #     {'text_pipeline': 0.5, 'starting_verb': 1},
-    #     {'text_pipeline': 0.8, 'starting_verb': 1},
-    # )
+  
     }
 
     cv = GridSearchCV(pipeline, param_grid=parameters, verbose=0, scoring=F1_SCORE_M, n_jobs=-1)
-
-
-
-
     return cv
 
+
 def build_model():
+    '''
+        Input: None
+        Returns: pipeline object
+
+        Desc:
+            Base model function() creates a pipeline of text transformation with randomforest classifier as an estimator.
+            Returns: pipeline 
+    '''
     
     pipeline = Pipeline([
         (   
@@ -154,19 +206,31 @@ def build_model():
     ])  
 
 
-    F1_SCORE_M = make_scorer(multioutput_f1_score, greater_is_better=True)
+    #F1_SCORE_M = make_scorer(multioutput_f1_score, greater_is_better=True)
 
-    parameters = {}
+    #parameters = {}
 
-    cv = GridSearchCV(pipeline, param_grid=parameters, verbose=0, scoring=F1_SCORE_M, n_jobs=-1)
-
-
+    #cv = GridSearchCV(pipeline, param_grid=parameters, verbose=0, scoring=F1_SCORE_M, n_jobs=-1)
 
 
-    return cv
+
+
+    return pipeline
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    '''
+        Input: model, X_test, y_test , category_names
+        Return: dataframe with evaluation results
+
+        Desc:
+            evaluate_model function evaluates the performance of the trained model.
+            Takes model, X_test , y_test and category_names as input and returns the evaluation dataframe 
+            
+
+            that contains the information about Accuracy, F1-Score, Precision and Recall
+
+    '''
     y_pred = model.predict(X_test)
     f1_score_results = []
     precision_results = []
@@ -176,7 +240,6 @@ def evaluate_model(model, X_test, Y_test, category_names):
     results_df = pd.DataFrame(index=category_names, columns=['Accuracy','F1-Score','Precision', 'Recall'])
 
     for category_index , category_name in enumerate(category_names):
-        #print(category_index, category_name)
 
         accuracy_res = accuracy_score(Y_test[:, category_index], y_pred[:, category_index])
         f1_score_res = f1_score(Y_test[:, category_index], y_pred[:, category_index], average='weighted')
@@ -187,9 +250,6 @@ def evaluate_model(model, X_test, Y_test, category_names):
         precision_results.append(precision_res)
         recall_results.append(recall_res)
         f1_score_results.append(f1_score_res)
-
-        #print("{0} : Accuracy = {1}, F1-Score = {2}, Recall = {3} , Precision = {4}".format(category_name, accuracy_res, f1_score_res, precision_res, recall_res))
-        #print("\n")
 
     results_df['Accuracy'] = accuracy_results
     results_df['F1-Score'] = f1_score_results
@@ -204,7 +264,15 @@ def evaluate_model(model, X_test, Y_test, category_names):
     print(results_df.mean(axis=0))    
     return results_df
 
+
 def save_model(model, model_filepath):
+    """
+        Input: model, model_filepath
+        Return : None
+
+        Desc:
+            save_model() function saves the trained model to disk for future use.
+    """
     with open(model_filepath, 'wb') as fObj:
         pickle.dump(model, fObj)
 
@@ -239,7 +307,6 @@ def main():
         print(tunned_model_results.head())
 
         draw_evaluation_plots(base_model_results, tunned_model_results)
-
 
         print(model.best_params_)
         print(model.best_score_)
